@@ -3,6 +3,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const mysql = require('mysql2');
 const fs = require('fs');
+const path = require('path'); 
 require('dotenv').config();
 
 const app = express();
@@ -30,7 +31,9 @@ db.connect((err) => {
   }
   console.log('Connected to the database.');
 });
-
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html')); // Serve the index.html file
+});
 // Login endpoint
 app.post('/login', (req, res) => {
   const { email, password } = req.body;
@@ -38,6 +41,7 @@ app.post('/login', (req, res) => {
 
   db.query(query, [email, password], (err, results) => {
     if (err) {
+     
       return res.status(500).send({ message: 'Server error' });
     }
     if (results.length > 0) {
@@ -47,6 +51,11 @@ app.post('/login', (req, res) => {
     }
   });
 });
+app.get('*',(req,res)=>{
+    res.send({
+        status:'ok'
+    })
+})
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
